@@ -5,7 +5,7 @@ Scripts to update guutboy.github.io
 To setup virtual environment run: 
 ```
 virtualenv env
-source enc/bin/activate
+source env/bin/activate
 pip install -r requirements.txt
 deactivate
 ```
