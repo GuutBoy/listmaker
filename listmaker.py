@@ -81,7 +81,7 @@ if len(sys.argv) == 5 :
   if (user_accept()):
     papers.insert(0,paper)
     with open(papersPath, 'w') as data_file:
-      json.dump(papers, data_file, separators=(',', ':'))
+      json.dump(papers, data_file, separators=(',', ':'), indent=0, sort_keys=True)
     with open(rssPath, 'w') as rss_file:
       feed = make_feed(papers)
       feed.write(rss_file, 'utf-8')
