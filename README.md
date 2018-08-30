@@ -11,6 +11,12 @@ deactivate
 ```
 Write the file `config.cfg` containing the following 
 ```
-web = [PATH TO WEB STUFF]
-cred = [PATH TO TWITTER STUFF]
+[Web]
+web = "PATH TO WEB STUFF"
+cred = "PATH TO TWITTER STUFF"
+[Data]
+unlabelled = "PATH TO UNLABELLED PAPERS"
+labelled = "PATH TO LABELLED PAPERS"
+[Model]
+model = "PATH TO TRAINED MODEL"
 ```
