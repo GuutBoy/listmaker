@@ -15,16 +15,16 @@ WEB_DIR=$(look_up_config $WEB_KEY)
 CRED=$(look_up_config $CRED_KEY)
 JSON=$WEB_DIR/scripts/papers.json
 RSS=$WEB_DIR/rss/list.rss
-
+pushd $MAIN_DIR
 if [ "$#" -lt 1 ]; then
     echo "Error. Needs one or more arguments."
     exit 1
 else
     # Get latest list of papers
-    cd $WEB_DIR
+    pushd $WEB_DIR
     git pull
     # Update list of papers
-    cd $MAIN_DIR
+    popd
     UPDATE=false
     UPLOAD=false
     # Activate virtual env to use the python script
@@ -48,11 +48,12 @@ else
         done
     fi
     if $UPLOAD; then
-        cd $WEB_DIR
+        pushd $WEB_DIR
         git add --all &&
         git commit -m "papers added" &&
         git push
+        popd
     fi
-    cd $MAIN_DIR
 fi
+popd
 exit 0
