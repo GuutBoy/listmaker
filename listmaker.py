@@ -5,6 +5,7 @@ import json
 import sys
 import tweepy
 import random
+import ConfigParser
 
 def tweet(paper, credPath):
   with open(credPath) as data_file:
@@ -47,23 +48,31 @@ def make_feed(papers):
     feed.add_item(title=p['title'], link=("https://eprint.iacr.org/" + p['id']), description=p['authors'], uniqueid=p['id'])
   return feed
 
-def scrape_from_eprint(eprintUrl):
-  try:
-    html_doc = urllib.urlopen(eprintUrl).read()
-    soup = BeautifulSoup(html_doc, 'html.parser')
-    paper = {'id':soup.title.text[34:],'title':soup.b.text,'authors':soup.i.text}
-    paper['title'] = " ".join((paper['title']).split())
-    paper['authors'] = " ".join((paper['authors']).split())
-  except:
-    sys.exit("Error handling url \"" + url + "\". Please, check if it is correct.");
-  return paper
-
-if len(sys.argv) == 5 :
-  eprintUrl = str(sys.argv[1])
-  papersPath = str(sys.argv[2])
-  rssPath = str(sys.argv[3])
-  credPath = str(sys.argv[4])
-  paper = scrape_from_eprint(eprintUrl)
+if len(sys.argv) == 2 :
+  eprintId = str(sys.argv[1]).split('/')
+  if (len(eprintId) != 2):
+    sys.exit('Malformed id: ' + str(sys.argv[1]))
+  year = int(eprintId[0])
+  serial = int(eprintId[1])
+  ## Read path to unlabelled papers from config
+  config = ConfigParser.RawConfigParser()
+  config.read('config.cfg')
+  papersPath = config.get('Web', 'web') + '/scripts/papers.json'
+  rssPath = config.get('Web', 'web') + '/rss/list.rss'
+  credPath = config.get('Web', 'cred')
+  labelledPath = config.get('Data', 'labelled')
+  with open(labelledPath) as labelled_file:
+    labelled_papers = json.load(labelled_file)
+  found = [p for p in labelled_papers if p['year'] == year and p['serial'] == serial]
+  if (len(found) < 1):
+    sys.exit('Could not find ' + str(sys.argv[1]))
+  if (len(found) > 1):
+    sys.exit('Found mutiple matches for ' + str(sys.argv[1]))
+  foundPaper = found[0]
+  paper = {
+    'id':str(foundPaper['year']) + '/' + str(foundPaper['serial']).zfill(3),
+    'title':foundPaper['title'],
+    'authors':' and '.join(foundPaper['authors'])}
   # Load papers database
   with open(papersPath) as data_file:
     papers = json.load(data_file)

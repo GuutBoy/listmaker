@@ -30,9 +30,9 @@ else
     # Activate virtual env to use the python script
     source env/bin/activate
     # Add each new paper to the list (and tweet about them)
-    for link in "$@"
+    for id in "$@"
     do
-        python listmaker.py $link $JSON $RSS $CRED && UPDATE=true 
+        python listmaker.py $id
     done
     deactivate
     # Upload the list of papers if it was updated or if explicitly told to do so

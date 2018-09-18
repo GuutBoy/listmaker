@@ -20,6 +20,6 @@ labelled_mpc_papers = [p for p in labelled_papers if p['mpc']]
 with open (web_path + "/scripts/papers.json") as mpc_file:
   papers = json.load(mpc_file)
 
-new_urls = ['https://eprint.iacr.org/' + eprintId(p) for p in labelled_mpc_papers if( not any( q['id'] == eprintId(p) for q in papers))]
+new_urls = [eprintId(p) for p in labelled_mpc_papers if( not any( q['id'] == eprintId(p) for q in papers))]
 
 print " ".join(new_urls)
