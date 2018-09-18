@@ -15,20 +15,22 @@ def main(stdscr):
   ## Read path to unlabelled and labelled papers from config
   config = ConfigParser.RawConfigParser()
   config.read('config.cfg')
-  unlabelled_path =  config.get('Data', 'unlabelled')
-  labelled_path =  config.get('Data', 'labelled')
+  unlabelled_path = config.get('Data', 'unlabelled')
+  labelled_path = config.get('Data', 'labelled')
   # Load labelled and unlabelled records
   with open(unlabelled_path) as recordFile:
     records = json.load(recordFile)
   with open(labelled_path) as labelled_file:
     old_records = json.load(labelled_file)
-  new_records = records[len(old_records):]
+  old_ids = [(p['year'], p['serial']) for p in old_records]
+  all_records = [p for p in records if (int(p['year']), int(p['serial'])) not in old_ids] + old_records
+  all_records.sort(key=lambda p : (p['year'], p['serial']))
   # Setup curses
   curses.start_color()
   curses.use_default_colors()
   curses.curs_set(False)
   # Start loop
-  selectloop(stdscr, (old_records + new_records)[::-1], 0)
+  selectloop(stdscr, all_records[::-1], 0)
 
 def selectloop(stdscr, records, focus):
   header = 'PAPERS'
@@ -54,7 +56,7 @@ def selectloop(stdscr, records, focus):
           prefix = '[?] '
       item = prefix + title + eprint_id
       if (focus == index - offset):
-        stdscr.addstr(index + 1 - offset, 0, padline(item), curses.A_STANDOUT)
+        stdscr.addstr(index + 1 - offset, 0, safeline(item), curses.A_STANDOUT)
       else:
         stdscr.addstr(index + 1 - offset, 0, safeline(item))
     stdscr.refresh()
