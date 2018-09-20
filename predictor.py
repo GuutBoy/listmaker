@@ -9,6 +9,21 @@ an mpc prediction yet. It then loads a a pre-trained classifier and uses it
 to add predictions to all papers found in the first step. The result is written back to
 the file of unlabelled papers"""
 
+def combi_predictions(unpredicted, model_path):
+  abs_clf = joblib.load(model_path + "abs")
+  tit_clf = joblib.load(model_path + "tit")
+  kw_clf = joblib.load(model_path + "kw")
+  aut_clf = joblib.load(model_path + "aut")
+  combi_clf = joblib.load(model_path + "combi")
+  tit_predictions = tit_clf.predict([p['title'] for p in papers]);
+  kw_predictions = kw_clf.predict([" ".join(p['kw']) for p in papers]);
+  abs_predictions = abs_clf.predict([p['abstract'] for p in papers]);
+  aut_predictions = aut_clf.predict([" ".join(p['authors']) for p in papers]);
+  combi_features = []
+  for i in range(0, len(unpredicted)):
+    combi_feature.append([float(abs_predictions[i]), float(tit_predictions[i]), float(kw_predictions[i]), float(aut_predictions[i])])
+  return combi_clf.predict(combi_features)
+
 ## Read path to unlabelled papers and model from config
 config = ConfigParser.RawConfigParser()
 config.read('config.cfg')
@@ -20,8 +35,7 @@ with open(unlabelled_path) as dataFile:
 unpredicted = [p for p in papers if 'pred' not in p]
 mpc_count = 0
 if len(unpredicted) > 0:
-  clf = joblib.load(model_path)
-  predicted = clf.predict([p['abstract'] for p in unpredicted])
+  predicted = combi_predictions(unpredicted)
   for i in range(0, len(unpredicted)):
     paper = unpredicted[i]
     if predicted[i] == 1:
