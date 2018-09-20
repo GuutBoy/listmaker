@@ -32,7 +32,7 @@ else
     # Add each new paper to the list (and tweet about them)
     for id in "$@"
     do
-        python listmaker.py $id
+        python listmaker.py $id && UPDATE=true
     done
     deactivate
     # Upload the list of papers if it was updated or if explicitly told to do so
