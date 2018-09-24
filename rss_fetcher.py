@@ -64,5 +64,5 @@ if len(new_records) > 0:
   records = records + new_records
   records = sorted(records, key=lambda k: k['year'] * 10000 + k['serial'])
   with open(unlabelled_path, 'w') as json_file:
-    json.dump(records, json_file, separators=(',', ':'), indent=0)
+    json.dump(records, json_file, separators=(',', ':'), indent=0, sort_keys=True)
 

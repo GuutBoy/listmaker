@@ -15,13 +15,14 @@ def combi_predictions(unpredicted, model_path):
   kw_clf = joblib.load(model_path + "kw")
   aut_clf = joblib.load(model_path + "aut")
   combi_clf = joblib.load(model_path + "combi")
-  tit_predictions = tit_clf.predict([p['title'] for p in papers]);
-  kw_predictions = kw_clf.predict([" ".join(p['kw']) for p in papers]);
-  abs_predictions = abs_clf.predict([p['abstract'] for p in papers]);
-  aut_predictions = aut_clf.predict([" ".join(p['authors']) for p in papers]);
+  tit_predictions = tit_clf.predict([p['title'] for p in unpredicted]);
+  kw_predictions = kw_clf.predict([" ".join(p['kw']) for p in unpredicted]);
+  abs_predictions = abs_clf.predict([p['abstract'] for p in unpredicted]);
+  aut_predictions = aut_clf.predict([" ".join(p['authors']) for p in unpredicted]);
   combi_features = []
   for i in range(0, len(unpredicted)):
-    combi_feature.append([float(abs_predictions[i]), float(tit_predictions[i]), float(kw_predictions[i]), float(aut_predictions[i])])
+    feature = [float(abs_predictions[i]), float(tit_predictions[i]), float(kw_predictions[i]), float(aut_predictions[i])]
+    combi_features.append(feature)
   return combi_clf.predict(combi_features)
 
 ## Read path to unlabelled papers and model from config
@@ -35,7 +36,7 @@ with open(unlabelled_path) as dataFile:
 unpredicted = [p for p in papers if 'pred' not in p]
 mpc_count = 0
 if len(unpredicted) > 0:
-  predicted = combi_predictions(unpredicted)
+  predicted = combi_predictions(unpredicted, model_path)
   for i in range(0, len(unpredicted)):
     paper = unpredicted[i]
     if predicted[i] == 1:
@@ -45,5 +46,5 @@ if len(unpredicted) > 0:
       paper[u'pred'] = False
       
   with open(unlabelled_path, 'w') as dataFile:
-    json.dump(papers, dataFile)
+    json.dump(papers, dataFile, separators=(',', ':'), indent=0, sort_keys=True)
 print str(mpc_count)

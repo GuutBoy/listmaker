@@ -80,7 +80,7 @@ def selectloop(stdscr, records, focus):
       labelled_path =  config.get('Data', 'labelled')
       records = [r for r in all_records if 'mpc' in r]
       with open(labelled_path, 'w') as labelled_file:
-        json.dump(records[::-1], labelled_file, separators=(',', ':'), indent=0)
+        json.dump(records[::-1], labelled_file, separators=(',', ':'), indent=0, sort_keys=True)
       break
     if key == ord('1'):
       focus = 0
