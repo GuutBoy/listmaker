@@ -18,7 +18,7 @@ def tweet(paper, credPath):
   auth.set_access_token(access_token, access_token_secret)
   api = tweepy.API(auth)
   # Construct message
-  cheers = ["Yay", "Wow", "Woo", "Yes", "Aha", "Ooh", "Wee", "OMG"]
+  cheers = ["Yay", "Wow", "Woo", "Yes", "Aha", "Ooh", "OMG", "Joy", "Gee"]
   prefix = random.choice(cheers)
   prefix = prefix + "! A new secure computation paper on eprint, \""
   suffix = "\" https://ia.cr/" + paper['id']
