@@ -9,7 +9,7 @@ MarkupSafe==1.0
 numpy==1.14.5
 oauthlib==2.0.7
 PySocks==1.6.8
-requests==2.18.4
+requests>=2.20.0
 requests-oauthlib==0.8.0
 scikit-learn==0.19.1
 scipy==1.1.0
