@@ -1,4 +1,4 @@
-import webhelpers.feedgenerator as feedgenerator
+from feedgen.feed import FeedGenerator
 from bs4 import BeautifulSoup
 import urllib
 import json
@@ -43,10 +43,19 @@ def user_accept():
     user_accept()
 
 def make_feed(papers):
-  feed = feedgenerator.Rss201rev2Feed(title=u"List of Secure Computation Papers",link=u"https://guutboy.github.io",description=u"A list of papers on IACR eprint on the topic of secure computation.",language=u"en")
+  fg = FeedGenerator()
+  fg.link(href='https://guutboy.github.io', rel='alternate' )
+  fg.title("List of Secure Computation Papers")
+  fg.description("A list of papers on IACR eprint on the topic of secure computation.")
+  fg.language("en")
+  fg.author( { 'name' : 'Peter Sebastian Nordholt', 'email' : 'peter.s.nordholt@alexandra.dk' } )
   for p in papers[:50]:
-    feed.add_item(title=p['title'], link=("https://eprint.iacr.org/" + p['id']), description=p['authors'], uniqueid=p['id'])
-  return feed
+    fe = fg.add_entry()
+    fe.id(p['id'])
+    fe.title(p['title'])
+    fe.link( href = "https://eprint.iacr.org/" + p['id'])
+    fe.description(p['authors'])
+  return fg.rss_str(pretty=True)
 
 if len(sys.argv) == 2 :
   eprintId = str(sys.argv[1]).split('/')
@@ -93,7 +102,7 @@ if len(sys.argv) == 2 :
       json.dump(papers, data_file, separators=(',', ':'), indent=0, sort_keys=True)
     with open(rssPath, 'w') as rss_file:
       feed = make_feed(papers)
-      feed.write(rss_file, 'utf-8')
+      rss_file.write(feed)
     tweet(paper, credPath)
   else:
     sys.exit('No paper added.')
