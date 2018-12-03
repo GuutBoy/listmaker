@@ -52,10 +52,11 @@ def selectloop(stdscr, records, focus):
       if focus == curses.LINES - 3:
         offset = min(len(records) - curses.LINES - 3, offset + 1)
       else:
-        focus = min(len(records) - 1, focus + 1)
+        focus = max(0, min(len(records) - 1, focus + 1))
     if key == ord('\n') or key== ord(' '):
       update = True
-      displayloop(stdscr, records[focus + offset])
+      if (len(records) > focus + offset): 
+        displayloop(stdscr, records[focus + offset])
     if key == ord('q'):
       update = True
       ## Read path to unlabelled and labelled papers from config
@@ -83,12 +84,14 @@ def selectloop(stdscr, records, focus):
       records = [r for r in all_records if 'mpc' not in r and 'pred' in r and r['pred']]
     if key == ord('t'):
       update = True
-      record = records[focus + offset]
-      record['mpc'] = True
+      if (len(records) > focus + offset): 
+        record = records[focus + offset]
+        record['mpc'] = True
     if key == ord('f'):
       update = True
-      record = records[focus + offset]
-      record['mpc'] = False
+      if (len(records) > focus + offset): 
+        record = records[focus + offset]
+        record['mpc'] = False
     if key == curses.KEY_RESIZE:
       update = True
       handleResize(stdscr)
