@@ -185,7 +185,7 @@ def safeline(line):
 def padline(line, padding=' '):
   line = safeline(line)
   line = line + (curses.COLS - len(line) - 1) * ' '
-  return line.encode('utf-8')
+  return line
 
 def multiline(line):
   natural_lines = line.split('\n')
