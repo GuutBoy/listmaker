@@ -1,6 +1,5 @@
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.model_selection import GridSearchCV
 from sklearn.linear_model import SGDClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.externals import joblib
@@ -8,7 +7,7 @@ from sklearn.utils import shuffle
 from sklearn import metrics
 import random 
 import json
-import ConfigParser
+from configparser import ConfigParser
 '''Trains a classifier to predict mpc papers.
 
 This script loads the list of labelled eprint papers and trains a classifier on the abstracts of
@@ -39,7 +38,7 @@ def constructDataset(papers, attribute='abstract'):
 
 
 ## Read path to unlabelled papers from config
-config = ConfigParser.RawConfigParser()
+config = ConfigParser()
 config.read('config.cfg')
 labelled_path =  config.get('Data', 'labelled')
 model_path =  config.get('Model', 'model')
@@ -58,7 +57,7 @@ text_clf.fit(dataDict['train_set'], dataDict['train_targets'])
 predicted = text_clf.predict(dataDict['test_set'])
 met = metrics.classification_report(dataDict['test_targets'], predicted, target_names=dataDict['target_names'])
 # print results
-print met
+print(met)
 # grid search stuff
 #parameters = {'vectorizer__ngram_range': [(1, 2), (1, 3), (1, 4)], 'transformer__use_idf': (True, False), 'clf__alpha': (1e-3, 1e-4, 1e-5), }
 #gs_clf = GridSearchCV(text_clf, parameters, n_jobs=-1)

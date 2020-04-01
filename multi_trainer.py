@@ -1,14 +1,12 @@
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.model_selection import GridSearchCV
 from sklearn.linear_model import SGDClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.externals import joblib
 from sklearn.utils import shuffle
 from sklearn import metrics
-import random 
 import json
-import ConfigParser
+from configparser import ConfigParser
 '''Trains a classifier to predict mpc papers.
 
 This script loads the list of labelled eprint papers and trains a classifier on the abstracts of
@@ -17,7 +15,7 @@ a file which can be loaded to do predictions of new papers.'''
 
 def constructDataset(papers):
   mpc_examples = [p for p in papers if p['mpc']]
-  train_size = len(mpc_examples) - (len(mpc_examples) / 5);
+  train_size = len(mpc_examples) - (len(mpc_examples) // 5);
   shuffled_mpc = shuffle(mpc_examples, random_state=20)
   train_mpc = shuffled_mpc[:train_size]
   non_mpc_examples = [p for p in papers if not p['mpc']]
@@ -67,7 +65,7 @@ def train(dataDict, params):
   predicted = text_clf.predict(dataDict['test_set'])
   met = metrics.classification_report(dataDict['test_targets'], predicted, target_names=dataDict['target_names'])
   # print results
-  print met  
+  print(met)
   return text_clf
 
 def trainNum(dataDict):
@@ -78,11 +76,11 @@ def trainNum(dataDict):
   predicted = clf.predict(dataDict['test_set'])
   met = metrics.classification_report(dataDict['test_targets'], predicted, target_names=dataDict['target_names'])
   # print results
-  print met
+  print(met)
   return clf
 
 ## Read path to unlabelled papers from config
-config = ConfigParser.RawConfigParser()
+config = ConfigParser()
 config.read('config.cfg')
 labelled_path =  config.get('Data', 'labelled')
 model_path =  config.get('Model', 'model')
@@ -91,20 +89,20 @@ with open(labelled_path) as dataFile:
   papers = json.load(dataFile)
 
 dataDict = constructDataset(papers)
-print 'Abstract'
-abs_params = { 'ngram_range' : (1,2), 'alpha' : 0.0001, 'use_idf' : True }
+print('Abstract')
+abs_params = {'ngram_range' : (1,2), 'alpha' : 0.0001, 'use_idf' : True}
 abs_clf = train(extract_attribute_dict(dataDict, 'abstract'), abs_params)
 
-print 'Title'
-tit_params = { 'ngram_range' : (1,2), 'alpha' : 0.001, 'use_idf' : True }
+print('Title')
+tit_params = {'ngram_range' : (1,2), 'alpha' : 0.001, 'use_idf' : True}
 tit_clf = train(extract_attribute_dict(dataDict, 'title'), tit_params)
 
-print 'Key Words'
-kw_params = { 'ngram_range' : (1,3), 'alpha' : 0.001, 'use_idf' : True }
+print('Key Words')
+kw_params = {'ngram_range' : (1,3), 'alpha' : 0.001, 'use_idf' : True} 
 kw_clf = train(extract_attribute_dict(dataDict, 'kw', join=True), kw_params)
 
-print 'Authors'
-aut_params = { 'ngram_range' : (1,4), 'alpha' : 1e-05, 'use_idf' : True }
+print('Authors')
+aut_params = {'ngram_range' : (1,4), 'alpha' : 1e-05, 'use_idf' : True}
 aut_clf = train(extract_attribute_dict(dataDict, 'authors', join=True), aut_params)
 
 tit_predictions = tit_clf.predict([p['title'] for p in papers]);
@@ -119,4 +117,3 @@ joblib.dump(tit_clf, model_path + "tit")
 joblib.dump(kw_clf, model_path + "kw")
 joblib.dump(aut_clf, model_path + "aut")
 joblib.dump(combi_clf, model_path + "combi")
-

@@ -2,7 +2,7 @@ import curses
 import json
 from curses import wrapper
 import webbrowser
-import ConfigParser
+from configparser import ConfigParser
 ''' This script implements a simple viewer to browse the list of labelled and unlabelled papers from
 eprint.
 
@@ -12,8 +12,8 @@ entry. Additionally, this tool can be used to label or re-label the papers. The 
 be written to the file of labelled papers. '''
 
 def main(stdscr):
-  ## Read path to unlabelled and labelled papers from config
-  config = ConfigParser.RawConfigParser()
+  # Read path to unlabelled and labelled papers from config
+  config = ConfigParser()
   config.read('config.cfg')
   unlabelled_path = config.get('Data', 'unlabelled')
   labelled_path = config.get('Data', 'labelled')
@@ -59,8 +59,8 @@ def selectloop(stdscr, records, focus):
         displayloop(stdscr, records[focus + offset])
     if key == ord('q'):
       update = True
-      ## Read path to unlabelled and labelled papers from config
-      config = ConfigParser.RawConfigParser()
+      # Read path to unlabelled and labelled papers from config
+      config = ConfigParser()
       config.read('config.cfg')
       labelled_path =  config.get('Data', 'labelled')
       records = [r for r in all_records if 'mpc' in r]
@@ -184,7 +184,7 @@ def safeline(line):
 
 def padline(line, padding=' '):
   line = safeline(line)
-  line = line + (curses.COLS - len(line) - 1) * ' '
+  line = line + ((curses.COLS - len(line) - 1) * ' ').encode('utf-8')
   return line
 
 def multiline(line):

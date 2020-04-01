@@ -1,11 +1,9 @@
 from feedgen.feed import FeedGenerator
-from bs4 import BeautifulSoup
-import urllib
 import json
 import sys
 import tweepy
 import random
-import ConfigParser
+from configparser import ConfigParser
 
 def tweet(paper, credPath):
   with open(credPath) as data_file:
@@ -33,7 +31,7 @@ def tweet(paper, credPath):
 def user_accept():
   yes = set(['yes','y','ye', ''])
   no = set(['no','n'])
-  choice = raw_input().lower()
+  choice = input().lower()
   if choice in yes:
     return True
   elif choice in no:
@@ -48,12 +46,12 @@ def make_feed(papers):
   fg.title("List of Secure Computation Papers")
   fg.description("A list of papers on IACR eprint on the topic of secure computation.")
   fg.language("en")
-  fg.author( { 'name' : 'Peter Sebastian Nordholt', 'email' : 'peter.s.nordholt@alexandra.dk' } )
+  fg.author({'name' : 'Peter Sebastian Nordholt', 'email' : 'guutboy@live.com'})
   for p in papers[:50]:
     fe = fg.add_entry()
     fe.id(p['id'])
     fe.title(p['title'])
-    fe.link( href = "https://eprint.iacr.org/" + p['id'])
+    fe.link(href = "https://eprint.iacr.org/" + p['id'])
     fe.description(p['authors'])
   return fg.rss_str(pretty=True)
 
@@ -64,7 +62,7 @@ if len(sys.argv) == 2 :
   year = int(eprintId[0])
   serial = int(eprintId[1])
   ## Read path to unlabelled papers from config
-  config = ConfigParser.RawConfigParser()
+  config = ConfigParser()
   config.read('config.cfg')
   papersPath = config.get('Web', 'web') + '/scripts/papers.json'
   rssPath = config.get('Web', 'web') + '/rss/list.rss'
@@ -100,7 +98,7 @@ if len(sys.argv) == 2 :
     papers.insert(0,paper)
     with open(papersPath, 'w') as data_file:
       json.dump(papers, data_file, separators=(',', ':'), indent=0, sort_keys=True)
-    with open(rssPath, 'w') as rss_file:
+    with open(rssPath, 'wb') as rss_file:
       feed = make_feed(papers)
       rss_file.write(feed)
     tweet(paper, credPath)

@@ -1,8 +1,8 @@
 from bs4 import BeautifulSoup
-import urllib
+import urllib.request
 import json
 import sys
-import ConfigParser
+from configparser import ConfigParser
 ''' This script checks the IACR eprint RSS (actually the Atom feed, because this is easier to parse)
 feed to check for new papers and stores new papers as an unlabelled record.
 
@@ -34,31 +34,35 @@ def is_newer_than(last_record, record):
   return newer
 
 ## Read path to unlabelled papers from config
-config = ConfigParser.RawConfigParser()
+config = ConfigParser()
 config.read('config.cfg')
 unlabelled_path =  config.get('Data', 'unlabelled')
 
 ## Fetch rss (atom) feed
-url = urllib.urlopen('https://eprint.iacr.org/rss/atom.xml')
-rss = url.read()
-url.close()
+with urllib.request.urlopen('https://eprint.iacr.org/rss/atom.xml') as url:
+  rss = url.read()
 
 ## Read all entries
 soup = BeautifulSoup(rss, 'xml')
 entries = soup.findAll('entry')
 ## Read in unlabelled papers
+records = []
 with open(unlabelled_path, 'r') as json_file:
   records = json.load(json_file)
-last_record = records[-1]
+
 ## Find any papers appearing in the rss feed not already stored as a unlabelled paper
 new_records = []
 for e in entries:
   r = scrape_eprint_record(e)
-  if (is_newer_than(last_record, r)):
+  if len(records) > 0 :
+    last_record = records[-1]
+    if (is_newer_than(last_record, r)):
+      new_records.append(r)
+  else:
     new_records.append(r)
 
 ## Print the amout of new papers    
-print str(len(new_records))
+print(str(len(new_records)))
 ## If there are new papers add these to the file of unlabelled papers
 if len(new_records) > 0:
   records = records + new_records

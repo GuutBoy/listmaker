@@ -1,13 +1,13 @@
-from sklearn.externals import joblib
+import joblib
 import json
-import sys
-import ConfigParser
+from configparser import ConfigParser
 """Adds mpc predictions to eprint papers.
 
 This script loads the unlabelled eprint papers and finds all papers that does not have
 an mpc prediction yet. It then loads a a pre-trained classifier and uses it
 to add predictions to all papers found in the first step. The result is written back to
 the file of unlabelled papers"""
+
 
 def combi_predictions(unpredicted, model_path):
   abs_clf = joblib.load(model_path + "abs")
@@ -25,8 +25,8 @@ def combi_predictions(unpredicted, model_path):
     combi_features.append(feature)
   return combi_clf.predict(combi_features)
 
-## Read path to unlabelled papers and model from config
-config = ConfigParser.RawConfigParser()
+# Read path to unlabelled papers and model from config
+config = ConfigParser()
 config.read('config.cfg')
 unlabelled_path =  config.get('Data', 'unlabelled')
 model_path =  config.get('Model', 'model')
@@ -47,4 +47,4 @@ if len(unpredicted) > 0:
       
   with open(unlabelled_path, 'w') as dataFile:
     json.dump(papers, dataFile, separators=(',', ':'), indent=0, sort_keys=True)
-print str(mpc_count)
+print(str(mpc_count))
