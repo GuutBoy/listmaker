@@ -2,7 +2,7 @@ from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import SGDClassifier
 from sklearn.pipeline import Pipeline
-from sklearn.externals import joblib
+import joblib
 from sklearn.utils import shuffle
 from sklearn import metrics
 import json
