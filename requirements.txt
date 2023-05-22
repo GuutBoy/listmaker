@@ -12,7 +12,7 @@ numpy==1.22.0
 oauthlib==2.0.7
 PySocks==1.6.8
 python-dateutil==2.8.1
-requests==2.23.0
+requests==2.31.0
 requests-oauthlib==0.8.0
 six==1.14.0
 tweepy==3.8.0
